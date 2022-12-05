@@ -7,9 +7,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.linus.quoteapp.API.APIRequestData;
 import com.linus.quoteapp.API.RetrofitServer;
+import com.linus.quoteapp.Adapter.AdapterQuotes;
 import com.linus.quoteapp.Model.QuotesModel;
 import com.linus.quoteapp.R;
 
@@ -23,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rvQuotes;
     private ProgressBar pbQuotes;
+    private List<QuotesModel> listQuotes;
+    private AdapterQuotes adQuotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +49,19 @@ public class MainActivity extends AppCompatActivity {
         retrieveProcess.enqueue(new Callback<List<QuotesModel>>() {
             @Override
             public void onResponse(Call<List<QuotesModel>> call, Response<List<QuotesModel>> response) {
-                
+
+                listQuotes = response.body();
+                adQuotes = new AdapterQuotes(listQuotes, MainActivity.this);
+                rvQuotes.setAdapter(adQuotes);
+                pbQuotes.setVisibility(View.GONE);
+
             }
 
             @Override
             public void onFailure(Call<List<QuotesModel>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Failed to reach server!", Toast.LENGTH_SHORT).show();
 
+                pbQuotes.setVisibility(View.GONE);
             }
         });
     }
